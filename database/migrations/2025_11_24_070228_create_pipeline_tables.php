@@ -8,29 +8,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Table untuk stages
-        Schema::create('pipeline_stages', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->integer('order')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('pipeline_stages')) {
+            Schema::create('pipeline_stages', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->unique();
+                $table->string('slug')->unique();
+                $table->text('description')->nullable();
+                $table->integer('order')->default(0);
+                $table->timestamps();
+            });
+        }
 
-        // Table untuk pipeline items
-        Schema::create('pipelines', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('stage_id')->constrained('pipeline_stages')->onDelete('cascade');
-            $table->string('customer_name');
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
-            $table->text('description')->nullable();
-            $table->decimal('value', 15, 2)->nullable();
-            $table->text('notes')->nullable();
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('pipelines')) {
+            Schema::create('pipelines', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('stage_id')->constrained('pipeline_stages')->onDelete('cascade');
+                $table->string('customer_name');
+                $table->string('phone')->nullable();
+                $table->string('email')->nullable();
+                $table->text('description')->nullable();
+                $table->decimal('value', 15, 2)->nullable();
+                $table->text('notes')->nullable();
+                $table->unsignedBigInteger('created_by')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

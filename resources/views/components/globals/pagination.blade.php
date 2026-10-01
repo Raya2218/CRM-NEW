@@ -4,7 +4,7 @@
 ])
 
 @if ($paginator && $paginator->hasPages())
-    <div class="flex items-center justify-between px-4 py-2.5 bg-white border-t border-gray-200">
+    <div class="pagination-container flex items-center justify-between px-4 py-2.5 bg-white border-t border-gray-200">
         {{-- Info --}}
         <div class="text-xs text-gray-700">
             Menampilkan 
@@ -24,8 +24,8 @@
                     <i class="fas fa-chevron-left text-[10px]"></i>
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" 
-                   class="px-2.5 py-1.5 text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                     <a href="{{ $paginator->previousPageUrl() }}" data-page="{{ $paginator->currentPage() - 1 }}" 
+                         class="pagination-link px-2.5 py-1.5 text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
                     <i class="fas fa-chevron-left text-[10px]"></i>
                 </a>
             @endif
@@ -37,8 +37,8 @@
 
             {{-- First page --}}
             @if ($start > 1)
-                <a href="{{ $paginator->url(1) }}" 
-                   class="px-2.5 py-1.5 min-w-[28px] text-center text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                     <a href="{{ $paginator->url(1) }}" data-page="1" 
+                         class="pagination-link px-2.5 py-1.5 min-w-[28px] text-center text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
                     1
                 </a>
                 @if ($start > 2)
@@ -53,8 +53,8 @@
                         {{ $page }}
                     </span>
                 @else
-                    <a href="{{ $paginator->url($page) }}" 
-                       class="px-2.5 py-1.5 min-w-[28px] text-center text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                          <a href="{{ $paginator->url($page) }}" data-page="{{ $page }}" 
+                              class="pagination-link px-2.5 py-1.5 min-w-[28px] text-center text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
                         {{ $page }}
                     </a>
                 @endif
@@ -65,16 +65,16 @@
                 @if ($end < $paginator->lastPage() - 1)
                     <span class="px-1 text-xs text-gray-400">...</span>
                 @endif
-                <a href="{{ $paginator->url($paginator->lastPage()) }}" 
-                   class="px-2.5 py-1.5 min-w-[28px] text-center text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                     <a href="{{ $paginator->url($paginator->lastPage()) }}" data-page="{{ $paginator->lastPage() }}" 
+                         class="pagination-link px-2.5 py-1.5 min-w-[28px] text-center text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
                     {{ $paginator->lastPage() }}
                 </a>
             @endif
 
             {{-- Next --}}
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" 
-                   class="px-2.5 py-1.5 text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                     <a href="{{ $paginator->nextPageUrl() }}" data-page="{{ $paginator->currentPage() + 1 }}" 
+                         class="pagination-link px-2.5 py-1.5 text-xs text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
                     <i class="fas fa-chevron-right text-[10px]"></i>
                 </a>
             @else

@@ -15,7 +15,7 @@
 class TableHandler {
     constructor(config) {
         console.log('🔧 TableHandler constructor called with config:', config);
-        
+
         this.config = {
             tableId: null,
             ajaxUrl: null,
@@ -31,14 +31,14 @@ class TableHandler {
         console.log('📋 Final config:', this.config);
 
         // DOM elements
-        this.searchInput = document.getElementById('searchInput') || 
-                          document.getElementById(`${this.config.tableId}SearchInput`) ||
-                          document.querySelector('input[type="text"][placeholder*="Cari"]');
-        
+        this.searchInput = document.getElementById('searchInput') ||
+            document.getElementById(`${this.config.tableId}SearchInput`) ||
+            document.querySelector('input[type="text"][placeholder*="Cari"]');
+
         this.tbody = document.querySelector(`#${this.config.tableId} tbody`);
-        
+
         this.paginationContainer = document.querySelector('.pagination-container') ||
-                                   document.querySelector(`#${this.config.tableId}-pagination`);
+            document.querySelector(`#${this.config.tableId}-pagination`);
 
         // State
         this.debounceTimer = null;
@@ -72,9 +72,9 @@ class TableHandler {
             console.warn('⚠️ Search input not found');
             return;
         }
-        
+
         console.log('✅ Attaching search listener to:', this.searchInput.id);
-        
+
         this.searchInput.addEventListener('input', (e) => {
             console.log('🔍 Search input event:', e.target.value);
             clearTimeout(this.debounceTimer);
@@ -87,17 +87,17 @@ class TableHandler {
 
     attachFilterListeners() {
         console.log('📌 Attaching filter listeners for:', this.config.filters);
-        
+
         this.config.filters.forEach(filterName => {
             let filterElement = document.querySelector(`[data-filter="${filterName}"]`);
-            
+
             if (!filterElement) {
                 const possibleIds = [
                     `filter${filterName.charAt(0).toUpperCase() + filterName.slice(1)}`,
                     `${this.config.tableId}_${this.slugify(filterName)}Filter`,
                     filterName
                 ];
-                
+
                 for (const id of possibleIds) {
                     filterElement = document.getElementById(id);
                     if (filterElement) {
@@ -141,7 +141,7 @@ class TableHandler {
     buildParams(page = 1) {
         const params = new URLSearchParams();
         params.append('page', page);
-        
+
         if (this.searchInput?.value && this.searchInput.value.trim() !== '') {
             params.append(this.config.searchParam, this.searchInput.value.trim());
             console.log(`✅ Search param: ${this.config.searchParam} = ${this.searchInput.value.trim()}`);
@@ -149,21 +149,21 @@ class TableHandler {
 
         this.config.filters.forEach(filterName => {
             let filterElement = document.querySelector(`[data-filter="${filterName}"]`);
-            
+
             if (!filterElement) {
                 const possibleIds = [
                     `filter${filterName.charAt(0).toUpperCase() + filterName.slice(1)}`,
                     `${this.config.tableId}_${this.slugify(filterName)}Filter`,
                     filterName
                 ];
-                
+
                 for (const id of possibleIds) {
                     filterElement = document.getElementById(id);
                     if (filterElement) break;
                 }
             }
 
-            if (filterElement && filterElement.value && 
+            if (filterElement && filterElement.value &&
                 filterElement.value !== '' && filterElement.value !== 'all') {
                 params.append(filterName.toLowerCase(), filterElement.value);
                 console.log(`✅ Filter param: ${filterName.toLowerCase()} = ${filterElement.value}`);
@@ -185,7 +185,7 @@ class TableHandler {
         try {
             const params = this.buildParams(page);
             this.lastParams = Object.fromEntries(params);
-            
+
             const url = `${this.config.ajaxUrl}?${params.toString()}`;
             console.log('🌐 Fetch URL:', url);
             console.log('📤 Params:', this.lastParams);
@@ -211,7 +211,7 @@ class TableHandler {
                 total: data.pagination?.total || 0,
                 sampleItem: data.items?.[0] // ✅ Log first item to see structure
             });
-            
+
             if (data.debug) {
                 console.log('🐛 Backend debug:', data.debug);
             }
@@ -252,7 +252,7 @@ class TableHandler {
     getColumnValue(item, col) {
         // Check if there's a mapping for this column
         const mappedKey = this.config.columnMapping[col] || col;
-        
+
         let value = item[mappedKey];
 
         // Handle nested values
@@ -277,6 +277,17 @@ class TableHandler {
             // Default to '-' if empty
             if (value === undefined || value === null || value === '') {
                 value = '-';
+            }
+
+            if (col === 'status') {
+                const isActive = String(value).toLowerCase() === 'active';
+                row += `
+                    <td style="padding: 0.5rem 0.75rem; white-space: nowrap;">
+                        <span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: ${isActive ? '#d1fae5' : '#fee2e2'}; color: ${isActive ? '#065f46' : '#991b1b'};">
+                            ${this.escapeHTML(String(value))}
+                        </span>
+                    </td>`;
+                return;
             }
 
             // ✅ NUMBER column (rownum)
@@ -335,7 +346,7 @@ class TableHandler {
             if (col === 'location') {
                 let mainLocation = '-';
                 let subLocation = '';
-                
+
                 if (value !== '-' && String(value).includes('|')) {
                     // Format: "Province | Regency, District, Village"
                     const parts = String(value).split('|').map(s => s.trim());
@@ -345,7 +356,7 @@ class TableHandler {
                     // Fallback: jika tidak ada separator, tampilkan semua
                     mainLocation = String(value);
                 }
-                
+
                 row += `
                     <td style="padding: 0.5rem 0.75rem;">
                         <div style="font-size: 0.8125rem; color: #111827;">
@@ -383,7 +394,7 @@ class TableHandler {
                 const salesData = typeof value === 'object' && value !== null ? value : { username: value, email: '' };
                 const username = salesData.username || String(value) || '-';
                 const email = salesData.email || 'No email';
-                
+
                 row += `
                     <td style="padding: 0.5rem 0.75rem; white-space: nowrap;">
                         <div style="display: flex; align-items: center;">
@@ -403,11 +414,11 @@ class TableHandler {
 
             // ✅ FOLLOW_UP column
             if (col === 'follow_up') {
-                const isYes = String(value).toLowerCase() === 'ya' || 
-                             String(value).toLowerCase() === 'yes' ||
-                             value === true || 
-                             value === 1;
-                
+                const isYes = String(value).toLowerCase() === 'ya' ||
+                    String(value).toLowerCase() === 'yes' ||
+                    value === true ||
+                    value === 1;
+
                 row += `
                     <td style="padding: 0.5rem 0.75rem; white-space: nowrap;">
                         ${isYes ? `
@@ -465,6 +476,16 @@ class TableHandler {
                         title="${action.title || 'Edit'}">
                         <i class="fas fa-${icon}"></i>
                     </button>`;
+            } else if (action.type === 'view') {
+                html += `
+                    <button
+                        onclick="${action.onclick || ''}"
+                        style="color: #059669; background: transparent; border: none; padding: 0.375rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.15s; font-size: 0.875rem;"
+                        onmouseover="this.style.backgroundColor='#d1fae5'; this.style.color='#047857';"
+                        onmouseout="this.style.backgroundColor='transparent'; this.style.color='#059669';"
+                        title="${action.title || 'Show Detail'}">
+                        <i class="fas fa-${icon}"></i>
+                    </button>`;
             } else if (action.type === 'delete') {
                 html += `
                     <button 
@@ -498,16 +519,16 @@ class TableHandler {
         this.paginationContainer.style.display = 'block';
 
         let html = `
-            <div style="padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div style="font-size: 0.875rem; color: #6b7280;">
-                    Showing <span style="font-weight: 500;">${from}</span> to <span style="font-weight: 500;">${to}</span>
-                    of <span style="font-weight: 500;">${total}</span> results
+            <div style="padding: 0.625rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="font-size: 0.75rem; color: #374151;">
+                    Menampilkan <span style="font-weight: 500;">${from}</span> sampai <span style="font-weight: 500;">${to}</span>
+                    dari <span style="font-weight: 500;">${total}</span> hasil
                 </div>
-                <div style="display: flex; gap: 0.5rem;">`;
+                <div style="display: flex; gap: 0.25rem;">`;
 
         const btn = (page, text, active = false) => `
             <button class="pagination-link" data-page="${page}"
-                style="padding: 0.5rem 0.75rem; border: 1px solid ${active ? '#6366f1' : '#e5e7eb'}; border-radius: 0.375rem; background: ${active ? '#6366f1' : 'white'}; color: ${active ? 'white' : '#374151'}; cursor: pointer; transition: all 0.2s; font-weight: ${active ? '500' : '400'};"
+                style="min-width: 1.75rem; padding: 0.375rem 0.625rem; border: 1px solid ${active ? '#6366f1' : '#d1d5db'}; border-radius: 0.375rem; background: ${active ? '#6366f1' : 'white'}; color: ${active ? 'white' : '#374151'}; cursor: pointer; transition: all 0.2s; font-size: 0.75rem; font-weight: ${active ? '500' : '400'};"
                 ${!active ? `onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='white'"` : ''}>
                 ${text}
             </button>`;

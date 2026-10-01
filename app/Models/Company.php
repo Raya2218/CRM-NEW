@@ -11,10 +11,11 @@ class Company extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'company_name', 
-        'company_type_id', 
-        'tier', 
-        'description', 
+        'company_name',
+        'company_type_id',
+        'company_code',
+        'tier',
+        'description',
         'status',
         'user_id',
         // 🔥 NEW: Address fields
@@ -25,16 +26,45 @@ class Company extends Model
         'village_id',
         // 🔥 NEW: Contact & Media fields
         'phone',
+        'mobile_phone',
         'email',
         'website',
         'linkedin',
         'instagram',
-        'logo'
+        'logo',
+        'owner',
+        'kemkes_link',
+        'sp_number',
+        'latitude',
+        'longitude',
+        'pic'
+    ];
+
+    protected $casts = [
+        'company_type_id' => 'integer',
+        'company_code' => 'integer',
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
     ];
 
     public function companyType()
     {
         return $this->belongsTo(CompanyType::class, 'company_type_id');
+    }
+
+    public function getCompanyTypeCodeAttribute(): string
+    {
+        return str_pad((string) $this->company_type_id, 5, '0', STR_PAD_LEFT);
+    }
+
+    public function getCompanyCodeAttribute($value): ?string
+    {
+        return $value === null ? null : str_pad((string) $value, 5, '0', STR_PAD_LEFT);
+    }
+
+    public function getCompanyFullCodeAttribute(): string
+    {
+        return $this->company_type_code . '>' . ($this->company_code ?? '00000');
     }
 
     public function user()

@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class TrendPageController extends Controller
 {
     public function index()
     {
-        $currentUser = auth()->user();
+        $currentUser = Auth::user();
 
         // Ambil sales list hanya jika superadmin (role_id = 1)
         $salesList = [];
